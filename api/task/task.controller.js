@@ -56,8 +56,8 @@ async function performTask(req, res) {
 }
 
 async function undoTasks(req, res){
-    await taskService.undoAll();
-    res.end();
+    const tasks = await taskService.undoAll();
+    res.send(tasks);
 }
 
 module.exports = {

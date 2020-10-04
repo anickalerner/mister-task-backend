@@ -119,7 +119,9 @@ async function undoAll() {
         const tasks = await query({ done: true });
         tasks.map(async (task) =>
             await update({ ...task, done: false, doneAt: '' })
-        )
+        )      
+        const resetTasks = get();  
+        return resetTasks;
     }
     catch (err) {
         console.log(`ERROR: cannot undo tasks, `, err)
