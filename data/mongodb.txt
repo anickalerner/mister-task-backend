@@ -1,0 +1,7 @@
+mister-task-user
+LNvL61L5ZKr3a5jk
+
+mongodb+srv://mister-task-user:<password>@cluster0.0rwf6.mongodb.net/test
+mongodb+srv://mister-task-user:LNvL61L5ZKr3a5jk@cluster0.0rwf6.mongodb.net/test
+
+mongodb+srv://mister-task-user:LNvL61L5ZKr3a5jk@cluster0.0rwf6.mongodb.net/mister-task?retryWrites=true&w=majority
