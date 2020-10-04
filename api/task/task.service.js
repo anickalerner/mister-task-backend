@@ -4,9 +4,8 @@ const externalService = require('../../services/external.service');
 const queueService = require('../../services/queue.service')
 const socketService = require('../socket/socket.routes');
 const ObjectId = require('mongodb').ObjectId;
-
-//setTimeout(()=>{setInterval(runTask, 2000)}, 2000);
-runTask()
+var gInterval = null;
+setTimeout(()=>{gInterval = setInterval(runTask, 2000)}, 2000);
 
 async function query(criteria = {}) {
     const collection = await dbService.getCollection('task')
@@ -94,18 +93,13 @@ async function perform(id) {
         await externalService.execute();
         task.done = true;
         task.doneAt = Date.now();
-        console.log('after external:', task);
-
-
     } catch (error) { // update task for error 
-        console.log('error');
         task.lastTriedAt = Date.now();
         task.done = false;
     } finally { // more updates for task 
-        console.log('finally');
         task.triesCount = task.triesCount ? task.triesCount + 1 : 1;
-        update(task);
-        socketService.getIO().emit('task done', task._id);
+        update(task)
+        socketService.getIO().emit('task done', JSON.stringify(task))
         return task;
     }
 
@@ -115,9 +109,7 @@ async function runTask() {
     if (tasks.length === 0) return;
     const queue = queueService.createQueue();
     tasks.map(task => queue.enqueue(task));
-    console.log(queue.printQueue());
     const taskToRun = queue.dequeue();
-    console.log('task to run:', taskToRun.title);
     perform(taskToRun._id);
 }
 
@@ -126,7 +118,7 @@ async function undoAll() {
     try {
         const tasks = await query({ done: true });
         tasks.map(async (task) =>
-            await update({ ...task, done: false })
+            await update({ ...task, done: false, doneAt: '' })
         )
     }
     catch (err) {
